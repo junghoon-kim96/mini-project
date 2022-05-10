@@ -1,13 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <style>
+        body {
+            background-color: RGBA(232, 52, 78, 0.2);
+            min-height: 100vh;
+        }
+
+        section {
+            padding: 1rem 1.5rem;
+            max-width: 750px;
+            margin: auto;
+        }
+
+        title {
+            font-weight: 800;
+            font-size: 5rem;
+        }
+
+        .subtitle {
+            font-size: 2rem;
+        }
+
+        .is-sparta {
+            color: #e8344e !important;
+        }
+
+        /*.button {*/
+        /*    width: 300px;*/
+        /*    height: 100px;*/
+        /*    margin: auto;*/
+        /*    display: block;*/
+        /*    color: darkred;*/
+        /*    background-color: black;*/
+        /*}*/
+        img{
+            margin: auto;
+            display: block;
+            margin-top: 200px;
+        }
+
+    </style>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script>function login(){
+    <script>function login() {
         window.location.href = '/login'
     }</script>
 </head>
 <body>
- <button class="button is-primary" onclick="login()">로그인</button>
+<section class="hero is-white">
+    <img src="../static/logo.jpg" alt="" onclick="login()">
+    <div class="hero-body has-text-centered" style="padding-bottom:1rem;margin:auto;">
+        <h3 class="subtitle is-sparta">유명 유튜버가 방문한 서울시 맛집을 소개합니다.</h3>
+    </div>
+</section>
+</section>
 </body>
 </html>
