@@ -1,11 +1,9 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
-
-app = Flask(__name__)
-
 from pymongo import MongoClient
 
-client = MongoClient('mongodb+srv://test:sparta@cluster0.kdwwh.mongodb.net/Cluster0?retryWrites=true&w=majority')
-db = client.test
+app = Flask(__name__)
+client = MongoClient('3.39.233.10', 27017, username="test", password="test")
+db = client.test1
 
 # JWT 토큰을 만들 때 필요한 비밀문자열입니다. 아무거나 입력해도 괜찮습니다.
 # 이 문자열은 서버만 알고있기 때문에, 내 서버에서만 토큰을 인코딩(=만들기)/디코딩(=풀기) 할 수 있습니다.
@@ -27,6 +25,7 @@ import hashlib
 #################################
 @app.route('/')
 def home():
+
     return render_template('index.html')
 
 @app.route('/login')
@@ -34,30 +33,32 @@ def login():
     msg = request.args.get("msg")
     return render_template('login.html', msg=msg)
 
-
-@app.route('/register')
-def register():
-    return render_template('register.html')
-
-
 #################################
 ##  로그인을 위한 API            ##
 #################################
 
 # [회원가입 API]
-# id, pw, nickname을 받아서, mongoDB에 저장합니다.
-# 저장하기 전에, pw를 sha256 방법(=단방향 암호화. 풀어볼 수 없음)으로 암호화해서 저장합니다.
-@app.route('/api/register', methods=['POST'])
-def api_register():
-    id_receive = request.form['id_give']
-    pw_receive = request.form['pw_give']
-    nickname_receive = request.form['nickname_give']
-
-    pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
-
-    db.user.insert_one({'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive})
-
+@app.route('/sign_up/save', methods=['POST'])
+def sign_up():
+    username_receive = request.form['username_give']
+    password_receive = request.form['password_give']
+    email_receive = request.form['email_give']
+    password_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
+    doc = {
+        "username": username_receive,
+        "password": password_hash,
+        "email": email_receive
+    }
+    db.users.insert_one(doc)
     return jsonify({'result': 'success'})
+
+# [중복확인 API]
+@app.route('/sign_up/check_dup', methods=['POST'])
+def check_dup():
+    username_receive = request.form['username_give']
+    exists = bool(db.users.find_one({"username": username_receive}))
+    # print(value_receive, type_receive, exists)
+    return jsonify({'result': 'success', 'exists': exists})
 
 
 # [로그인 API]
@@ -71,7 +72,7 @@ def api_login():
     pw_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
 
     # id, 암호화된pw을 가지고 해당 유저를 찾습니다.
-    result = db.user.find_one({'id': username_receive, 'pw': pw_hash})
+    result = db.users.find_one({'username': username_receive, 'password': pw_hash})
 
     # 찾으면 JWT 토큰을 만들어 발급합니다.
     if result is not None:
@@ -110,7 +111,7 @@ def api_valid():
         print(payload)
         # payload 안에 id가 들어있습니다. 이 id로 유저정보를 찾습니다.
         # 여기에선 그 예로 닉네임을 보내주겠습니다.
-        userinfo = db.user.find_one({'id': payload['id']}, {'_id': 0})
+        userinfo = db.users.find_one({'id': payload['id']}, {'_id': 0})
         return render_template('main.html', user_info=userinfo)
     except jwt.ExpiredSignatureError:
         # 위를 실행했는데 만료시간이 지났으면 에러가 납니다.
