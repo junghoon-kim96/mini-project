@@ -2,7 +2,7 @@ from flask import Flask, render_template, jsonify, request, session, redirect, u
 from pymongo import MongoClient
 
 app = Flask(__name__)
-client = MongoClient('3.39.233.10', 27017, username="test", password="test")
+client = MongoClient('mongodb+srv://test:sparta@cluster0.kdwwh.mongodb.net/Cluster0?retryWrites=true&w=majority')
 db = client.test1
 
 # JWT 토큰을 만들 때 필요한 비밀문자열입니다. 아무거나 입력해도 괜찮습니다.
@@ -116,8 +116,46 @@ def api_valid():
     except jwt.ExpiredSignatureError:
         # 위를 실행했는데 만료시간이 지났으면 에러가 납니다.
         return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
-    # except jwt.exceptions.DecodeError:
-    #     return render_template('main.html')
+
+@app.route("/matjip", methods=["POST"])
+def matjip_post():
+    title_receive = request.form['title_give']
+    place_receive = request.form['place_give']
+    impre_receive = request.form['impre_give']
+    url_receive = request.form['url_give']
+
+    picture = request.files["picture_give"]
+
+    # 확장자를 골라주는 코드 코드(뒤에서 부터 첫번째 점으로 나눠준다)
+    extension = picture.filename.split('.')[-1]
+
+    # 현재시간을 나타내주는 코드
+    today = datetime.datetime.now()
+    mytime = today.strftime('%Y-%m-%d-%H-%M-%S')
+
+    filename = f'picture-{mytime}'
+
+    # static폴더에 저장해라
+    save_to = f'static/{filename},{extension}'
+    picture.save(save_to)
+
+    doc = {
+        'title': title_receive,
+        'place': place_receive,
+        'url': url_receive,
+        'impre': impre_receive,
+        'picture': f'{filename},{extension}'
+
+    }
+
+    db.matjipprac3.insert_one(doc)
+
+    return jsonify({'msg': '등록 완료 !'})
+
+@app.route('/listing', methods=['GET'])
+def listing():
+    matjips = list(db.matjipprac3.find({}, {'_id': False}))
+    return jsonify({'matjips': matjips})
 
 
 if __name__ == '__main__':
