@@ -9,13 +9,9 @@ from datetime import datetime
 
 @app.route('/')
 def main():
-    matjips = list(db.matjipprac2.find({},{"_id": False}))
-    return render_template('main_page3.html', matjips=matjips)
+    return render_template('main_page.html')
 
 
-@app.route('/detail')
-def detail():
-   return render_template('detail_page.html')
 
 @app.route("/matjip", methods=["POST"])
 def matjip_post():
@@ -27,7 +23,7 @@ def matjip_post():
     picture = request.files["picture_give"]
 
     # 확장자를 골라주는 코드 코드(뒤에서 부터 첫번째 점으로 나눠준다)
-    extension = picture.filename.split('.')[-1]
+    extension = picture.filename.split(',')[-1]
 
     # 현재시간을 나타내주는 코드
     today = datetime.now()
@@ -39,9 +35,6 @@ def matjip_post():
     save_to = f'static/{filename},{extension}'
     picture.save(save_to)
 
-    # matjip_list = list(db.matjipprac.find({}, {'_id': False}))
-    #
-    # count = len(matip_list) + 1
 
     doc = {
         'title': title_receive,
@@ -52,18 +45,18 @@ def matjip_post():
 
     }
 
-    db.matjipprac2.insert_one(doc)
+    db.matjipprac3.insert_one(doc)
 
     return jsonify({'msg': '등록 완료 !'})
-    return render_template("main_page3.html")
+    return render_template("main_page.html")
 
 
 
 
-# @app.route('/listing', methods=['GET'])
-# def listing():
-#     matjips = list(db.matjipprac.find({},{'_id':False}))
-#     return jsonify({'matjips':matjips})
+@app.route('/listing', methods=['GET'])
+def listing():
+    matjips = list(db.matjipprac3.find({},{'_id':False}))
+    return jsonify({'matjips':matjips})
 
 
 
