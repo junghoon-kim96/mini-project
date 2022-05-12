@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+    <title>detail</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Jua', sans-serif;
+        }
+
+        .posting-box {
+            width: 500px;
+            margin-top: 20px;
+        }
+
+        .wrap {
+            width: 900px;
+            margin: auto;
+        }
+        .container {
+            pedding : 0 auto;
+        }
+    </style>
+    <script>
+        function save_matjip() {
+
+            let title = $('#title').val()
+            let place = $('#place').val()
+            let impre = $('#impre').val()
+            let url = $("#url").val()
+
+            let picture = $('#picture')[0].files[0]
+            let form_data = new FormData()
+
+            form_data.append("title_give", title)
+            form_data.append("place_give", place)
+            form_data.append("impre_give", impre)
+            form_data.append("picture_give", picture)
+            form_data.append("url_give", url)
+
+            $.ajax({
+                type: "POST",
+                url: "/matjip",
+                data: form_data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    alert(response["msg"])
+                    window.location.href = '/'
+                }
+            });
+        }
+    </script>
+</head>
+
+<body>
+<div class="wrap">
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1>맛집 일기장</h1>
+            <div class="posting-box">
+                <div class="mb-3">
+                    <input class="form-control" type="file" id="picture">
+                </div>
+                <div class="form-group">
+                    <input type="email" class="form-control" id="title" placeholder="사진 제목">
+                </div>
+                <div class="form-group">
+                    <input type="email" class="form-control" id="place" placeholder="장소">
+                </div>
+                <div class="form-group">
+                    <input type="email" class="form-control" id="url" placeholder="url">
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" id="impre" rows="3" placeholder="내용 입력"></textarea>
+                </div>
+                <div class="field is-grouped is-grouped-right">
+                    <p class="control">
+                        <a class="button is-primary" onclick="save_matjip()">
+                            저장하기
+                        </a>
+                    </p>
+                    <p class="control">
+                        <a class="button is-light">
+                            취소하기
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+
+</html>
