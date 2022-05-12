@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!--    #폰트-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+    <!--    #붙여넣기 파일이름 생성-->
+    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"></script>
+    <title>너알맛</title>
+
+    <style>
+        .mytitle {
+            background-color: green;
+        }
+
+        .mytitle > img {
+            margin-right: 1100px;
+        }
+
+        .wrap {
+            width: 500px;
+            margin: auto;
+
+            margin-top: 30px;
+        }
+
+        .post_box > .custom-file {
+            margin-bottom: 20px;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            // #파일업로드 코드
+            bsCustomFileInput.init()
+            listing()
+        })
+
+        function listing() {
+            $('#cards-box').empty()
+            $.ajax({
+                type: "GET",
+                url: "/diary",
+                data: {},
+                success: function (response) {
+                    let diaries = response['all_diary']
+                    for (let i = 0; i < diaries.length; i++) {
+                        let title = diaries[i]['title']
+                        let content = diaries[i]['content']
+                        let file = diaries[i]['file']
+                        let url = diaries[i]['url']
+
+                        let temp_html = `<div class="card">
+                                            <img src="../static/${file}" class="card-img-top">
+                                            <div class="card-body">
+                                                <h5 class="card-title">${title}</h5>
+                                                <p class="card-text">${content}</p>
+                                                <a target="_blank" href="${url}" class="card-url">구경가자</a>
+                                            </div>
+                                        </div>`
+                        $('#cards-box').append(temp_html)
+
+
+                    }
+                }
+            })
+        }
+
+        function posting() {
+            let title = $('#title').val()
+            let content = $("#content").val()
+            let url = $("#url").val()
+
+            let file = $('#file')[0].files[0]
+            let form_data = new FormData()
+
+            form_data.append("file_give", file)
+            form_data.append("title_give", title)
+            form_data.append("content_give", content)
+            form_data.append("url_give", url)
+
+            $.ajax({
+                type: "POST",
+                url: "/diary",
+                data: form_data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    alert(response["msg"])
+                    window.location.reload()
+                }
+            });
+        }
+
+        function open_box() {
+            $('#post-box').show()
+        }
+
+        function close_box() {
+            $('#post-box').hide()
+        }
+
+    </script>
+</head>
+
+
+<body>
+<div class="mytitle">
+    <img src="/static/logo.jpg">
+    <button type="button" class="btn btn-primary" onclick="open_box()">포스팅</button>
+    <button type="button" class="btn btn-secondary" onclick="window.location.href = '/main'">로그아웃</button>
+</div>
+<div id="post-box" class="wrap">
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <div class="post_box">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="file">
+                    <label class="custom-file-label" for="file">사진선택</label>
+                </div>
+                <div class="form-group">
+                    <input type="email" class="form-control" id="title" placeholder="제목">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" id="url" placeholder="url">
+                </div>
+                <div class="form-group">
+                        <textarea class="form-control" id="content" rows="3"
+                                  placeholder="내용"></textarea>
+                </div>
+                <button onclick="posting()" type="button" class="btn btn-primary">저장</button>
+                <button onclick="close_box()" type="button" class="btn btn-secondary">닫기</button>
+            </div>
+        </div>
+    </div>
+<!--    <div class="card-columns" id="cards-box">-->
+<!--        &lt;!&ndash;        <div class="card">&ndash;&gt;-->
+<!--        &lt;!&ndash;            &lt;!&ndash;        <img class="card-img-top" src="..." alt="Card image cap">&ndash;&gt;&ndash;&gt;-->
+<!--        &lt;!&ndash;            <div class="card-body">&ndash;&gt;-->
+<!--        &lt;!&ndash;                <h5 class="card-title">부산</h5>&ndash;&gt;-->
+<!--        &lt;!&ndash;                <p class="card-text">좋았다</p>&ndash;&gt;-->
+<!--        &lt;!&ndash;            </div>&ndash;&gt;-->
+<!--        &lt;!&ndash;        </div>&ndash;&gt;-->
+<!--        &lt;!&ndash;        <div class="card">&ndash;&gt;-->
+<!--        &lt;!&ndash;            &lt;!&ndash;        <img class="card-img-top" src="..." alt="Card image cap">&ndash;&gt;&ndash;&gt;-->
+<!--        &lt;!&ndash;            <div class="card-body">&ndash;&gt;-->
+<!--        &lt;!&ndash;                <h5 class="card-title">부산</h5>&ndash;&gt;-->
+<!--        &lt;!&ndash;                <p class="card-text">좋았다</p>&ndash;&gt;-->
+<!--        &lt;!&ndash;            </div>&ndash;&gt;-->
+<!--        &lt;!&ndash;        </div>&ndash;&gt;-->
+<!--        &lt;!&ndash;        <div class="card">&ndash;&gt;-->
+<!--        &lt;!&ndash;            &lt;!&ndash;        <img class="card-img-top" src="..." alt="Card image cap">&ndash;&gt;&ndash;&gt;-->
+<!--        &lt;!&ndash;            <div class="card-body">&ndash;&gt;-->
+<!--        &lt;!&ndash;                <h5 class="card-title">부산</h5>&ndash;&gt;-->
+<!--        &lt;!&ndash;                <p class="card-text">좋았다</p>&ndash;&gt;-->
+<!--        &lt;!&ndash;            </div>&ndash;&gt;-->
+<!--        &lt;!&ndash;        </div>&ndash;&gt;-->
+<!--        &lt;!&ndash;        <div class="card">&ndash;&gt;-->
+<!--        &lt;!&ndash;            &lt;!&ndash;        <img class="card-img-top" src="..." alt="Card image cap">&ndash;&gt;&ndash;&gt;-->
+<!--        &lt;!&ndash;            <div class="card-body">&ndash;&gt;-->
+<!--        &lt;!&ndash;                <h5 class="card-title">부산</h5>&ndash;&gt;-->
+<!--        &lt;!&ndash;                <p class="card-text">좋았다</p>&ndash;&gt;-->
+<!--        &lt;!&ndash;            </div>&ndash;&gt;-->
+<!--        &lt;!&ndash;        </div>&ndash;&gt;-->
+<!--        &lt;!&ndash;        <div class="card">&ndash;&gt;-->
+<!--        &lt;!&ndash;            &lt;!&ndash;        <img class="card-img-top" src="..." alt="Card image cap">&ndash;&gt;&ndash;&gt;-->
+<!--        &lt;!&ndash;            <div class="card-body">&ndash;&gt;-->
+<!--        &lt;!&ndash;                <h5 class="card-title">부산</h5>&ndash;&gt;-->
+<!--        &lt;!&ndash;                <p class="card-text">좋았다</p>&ndash;&gt;-->
+<!--        &lt;!&ndash;            </div>&ndash;&gt;-->
+<!--        &lt;!&ndash;        </div>&ndash;&gt;-->
+<!--        &lt;!&ndash;        <div class="card">&ndash;&gt;-->
+<!--        &lt;!&ndash;            <img src="../static/${file}" class="card-img-top">&ndash;&gt;-->
+<!--        &lt;!&ndash;            <div class="card-body">&ndash;&gt;-->
+<!--        &lt;!&ndash;                <h5 class="card-title">${title}</h5>&ndash;&gt;-->
+<!--        &lt;!&ndash;                <p class="card-text">${content}</p>&ndash;&gt;-->
+<!--        &lt;!&ndash;                <a class="card-link">${lk}</a>&ndash;&gt;-->
+<!--        &lt;!&ndash;            </div>&ndash;&gt;-->
+<!--        &lt;!&ndash;        </div>&ndash;&gt;-->
+<!--    </div>-->
+</div>
+<div class="card-columns" id="cards-box">
+    <!--    <div class="card">-->
+    <!--        &lt;!&ndash;        <img class="card-img-top" src="..." alt="Card image cap">&ndash;&gt;-->
+    <!--        <div class="card-body">-->
+    <!--            <h5 class="card-title">부산</h5>-->
+    <!--            <p class="card-text">좋았다</p>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--    <div class="card">-->
+    <!--        &lt;!&ndash;        <img class="card-img-top" src="..." alt="Card image cap">&ndash;&gt;-->
+    <!--        <div class="card-body">-->
+    <!--            <h5 class="card-title">부산</h5>-->
+    <!--            <p class="card-text">좋았다</p>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--    <div class="card">-->
+    <!--        &lt;!&ndash;        <img class="card-img-top" src="..." alt="Card image cap">&ndash;&gt;-->
+    <!--        <div class="card-body">-->
+    <!--            <h5 class="card-title">부산</h5>-->
+    <!--            <p class="card-text">좋았다</p>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--    <div class="card">-->
+    <!--        &lt;!&ndash;        <img class="card-img-top" src="..." alt="Card image cap">&ndash;&gt;-->
+    <!--        <div class="card-body">-->
+    <!--            <h5 class="card-title">부산</h5>-->
+    <!--            <p class="card-text">좋았다</p>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--    <div class="card">-->
+    <!--        &lt;!&ndash;        <img class="card-img-top" src="..." alt="Card image cap">&ndash;&gt;-->
+    <!--        <div class="card-body">-->
+    <!--            <h5 class="card-title">부산</h5>-->
+    <!--            <p class="card-text">좋았다</p>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--    <div class="card">-->
+    <!--        <img src="../static/${file}" class="card-img-top">-->
+    <!--        <div class="card-body">-->
+    <!--            <h5 class="card-title">${title}</h5>-->
+    <!--            <p class="card-text">${content}</p>-->
+    <!--            <a class="card-link">${lk}</a>-->
+    <!--        </div>-->
+    <!--    </div>-->
+</div>
+</body>
+</html>
+
+
+
