@@ -4,7 +4,7 @@
 ##### <span style="color:royalblue"> - 친구,지인,모르는사람 할거 없이 내가 갔던 맛집을 공유하며 음식으로 교감을 쌓아보자 </span>
 
 <깃헙주소>
-https://github.com/junghoon-kim96/kimchi-recipe
+https://github.com/junghoon-kim96/mini-project
 
 <도메인주소>
 http://54.180.94.64
